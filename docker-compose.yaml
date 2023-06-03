@@ -1,0 +1,12 @@
+version: '3'
+services:
+  signal-server:
+    image: maven:3.8.6-openjdk-18
+    container_name: signal-server
+    restart: always
+    volumes:
+      - /cache/docker/maven_3.8.6-openjdk-18:/root/.m2
+      - ./sbin/signal-server/start.sh:/myapp/start.sh
+    command: /myapp/start.sh
+
+
