@@ -1,5 +1,21 @@
 version: '3'
 services:
+  signal-aws-appconfig:
+    image: 923839683/aws-appconfig-emulator:1.0.0
+    container_name: signal-aws-appconfig
+    restart: always
+    platform: linux/amd64
+    volumes:
+      - ./appconfig/config.yml:/go/release/config.yml
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9007" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    networks:
+      signal_network:
+        ipv4_address: 172.23.0.2
+
   signal-redis-cluster1:
     image: redis:7.0.4-bullseye
     container_name: signal-redis-cluster1
@@ -134,7 +150,7 @@ services:
   signal-server:
     image: maven:3.8.6-openjdk-18
     container_name: signal-server
-    restart: always
+    restart: "no"
     volumes:
       - ./cache/docker/maven_3.8.6-openjdk-18:/root/.m2
       - ./signal-server/app/:/myapp
@@ -142,7 +158,10 @@ services:
     command: "bash /myapp/start.sh"
     networks:
       signal_network:
-        ipv4_address: 172.23.2.1
+        ipv4_address: 172.23.200.1
+    depends_on:
+      - signal-aws-appconfig
+      - signal-redis-cluster-starter
 
 networks:
   signal_network:

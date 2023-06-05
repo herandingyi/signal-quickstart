@@ -9,7 +9,9 @@ recoverAndFix() {
     sed -i "$arg" "$1"
   done
 }
-
+replace(){
+  cp /myapp/src/"$1" "$1"
+}
 mkdir -p /git/src
 cd /git/src || exit
 if [ ! -f ./signal-server/LICENSE ]; then
@@ -19,7 +21,26 @@ cd ./signal-server || exit
 
 echo "start fix local signal"
 
-#cdn 添加 endpoint
+# 支持本地appConfig服务
+recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configuration/AppConfigConfiguration.java 's#String configuration;#String configuration;\
+  @JsonProperty\
+  private String endpoint;\
+  public String getEndpoint() {\
+    return endpoint;\
+  }#'
+# 支持本地appConfig服务
+replace ./service/src/main/java/org/whispersystems/textsecuregcm/storage/DynamicConfigurationManager.java
+# 支持本地appConfig服务
+recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/workers/AssignUsernameCommand.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, configuration.getAppConfig().getEndpoint());#'
+# 支持本地appConfig服务
+recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/workers/DeleteUserCommand.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, configuration.getAppConfig().getEndpoint());#'
+# 支持本地appConfig服务
+recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/workers/SetUserDiscoverabilityCommand.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, configuration.getAppConfig().getEndpoint());#'
+# 支持本地appConfig服务
+recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/WhisperServerService.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, config.getAppConfig().getEndpoint());#'
+
+
+# 支持s3链接本地minio
 recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configuration/CdnConfiguration.java 's#String region;#String region;\
   @JsonProperty\
   private String endpoint;\
@@ -27,7 +48,7 @@ recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configura
     return endpoint;\
   }#'
 
-#gcp 添加 scheme
+# 支持gcp链接本地
 recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configuration/GcpAttachmentsConfiguration.java 's#String domain;#String domain;\
   @JsonProperty\
   private String scheme;\
@@ -35,7 +56,7 @@ recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configura
     return scheme;\
   }#'
 
-#请求sms验证码, 直接返回ok & 请求人机验证, 直接返回ok
+# 请求sms验证码直接返回ok 请求人机验证直接返回ok
 recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/controllers/AccountController.java 's#RateLimitExceededException, ImpossiblePhoneNumberException, NonNormalizedPhoneNumberException {#RateLimitExceededException, ImpossiblePhoneNumberException, NonNormalizedPhoneNumberException {\
     if (true) {\
       return Response.ok().build();\
@@ -46,9 +67,10 @@ recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/controlle
 
 echo "finish fix local signal"
 
-echo "start build local signal"
-mvn clean package -DskipTests -Pexclude-abusive-message-filter
-echo "finish build local signal"
+if [ ! -f ./service/target/TextSecureServer-7.71.0-dirty.jar ]; then
+  echo "start build local signal"
+  mvn clean package -DskipTests -Pexclude-abusive-message-filter
+  echo "finish build local signal"
+fi
 
 java -server -Djava.awt.headless=true -Xmx8192m -Xss512k -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=utf-8 -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar server /myapp/sample.yml
-
