@@ -38,7 +38,7 @@ import software.amazon.awssdk.regions.Region;\
 import software.amazon.awssdk.services.appconfigdata.AppConfigDataClientBuilder;\
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;\
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;\
-
+\
 public#' 's#^      Class<T> configurationClass) {#      Class<T> configurationClass, String endpoint) {\
     final AppConfigDataClientBuilder builder = AppConfigDataClient\
         .builder()\
