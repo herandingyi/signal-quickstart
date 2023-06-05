@@ -32,7 +32,14 @@ cd ./signal-server || exit
     return endpoint;\
   }#'
   # 支持本地appConfig服务
-  recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/DynamicConfigurationManager.java '/this(AppConfigDataClient/,+6d' 's#^      Class<T> configurationClass) {#      Class<T> configurationClass, String endpoint) {\
+  recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/DynamicConfigurationManager.java '/this(AppConfigDataClient/,+6d' 's#^public#\
+import io.netty.util.internal.StringUtil;\
+import software.amazon.awssdk.regions.Region;\
+import software.amazon.awssdk.services.appconfigdata.AppConfigDataClientBuilder;\
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;\
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;\
+
+public#' 's#^      Class<T> configurationClass) {#      Class<T> configurationClass, String endpoint) {\
     final AppConfigDataClientBuilder builder = AppConfigDataClient\
         .builder()\
         .overrideConfiguration(ClientOverrideConfiguration.builder()\
