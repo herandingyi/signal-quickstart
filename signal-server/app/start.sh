@@ -33,6 +33,7 @@ cd ./signal-server || exit
   }#'
   # 支持本地appConfig服务
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/DynamicConfigurationManager.java '/this(AppConfigDataClient/,+6d' 's#^public#\
+import java.net.URI;\
 import io.netty.util.internal.StringUtil;\
 import software.amazon.awssdk.regions.Region;\
 import software.amazon.awssdk.services.appconfigdata.AppConfigDataClientBuilder;\
