@@ -10,7 +10,7 @@ stripe:
     Example
 
 dynamoDbClientConfiguration:
-  region: us-west-2 # AWS Region
+  region: http://172.23.0.3:8000 # AWS Region
 
 dynamoDbTables:
   accounts:
@@ -104,32 +104,8 @@ directory:
     accessSecret: test  # AWS SQS accessSecret
     queueUrls: # AWS SQS queue urls
       - https://sqs.example.com/directory.fifo
-  server: # One or more CDS servers
-    - replicationName: example           # CDS replication name
-      replicationUrl: cds.example.com    # CDS replication endpoint base url
-      replicationPassword: example       # CDS replication endpoint password
-      replicationCaCertificate: |        # CDS replication endpoint TLS certificate trust root
-        -----BEGIN CERTIFICATE-----
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789+abcdefghijklmnopqrstuvwxyz
-        AAAAAAAAAAAAAAAAAAAA
-        -----END CERTIFICATE-----
+  server: [] # One or more CDS servers
+
 
 directoryV2:
   client: # Configuration for interfacing with Contact Discovery Service v2 cluster

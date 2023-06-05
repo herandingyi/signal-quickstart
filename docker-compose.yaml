@@ -1,8 +1,8 @@
 version: '3'
 services:
-  signal-aws-appconfig:
+  signal-appconfig:
     image: 923839683/aws-appconfig-emulator:1.0.0
-    container_name: signal-aws-appconfig
+    container_name: signal-appconfig
     restart: always
     platform: linux/amd64
     volumes:
@@ -15,6 +15,21 @@ services:
     networks:
       signal_network:
         ipv4_address: 172.23.0.2
+
+  signal-dynamodb:
+    image: amazon/dynamodb-local:1.18.0
+    container_name: signal-dynamodb
+    restart: always
+    volumes:
+      - ./dynamodb/data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    networks:
+      signal_network:
+        ipv4_address: 172.23.0.3
 
   signal-redis-cluster1:
     image: redis:7.0.4-bullseye
@@ -160,7 +175,7 @@ services:
       signal_network:
         ipv4_address: 172.23.200.1
     depends_on:
-      - signal-aws-appconfig
+      - signal-appconfig
       - signal-redis-cluster-starter
 
 networks:
