@@ -4,7 +4,6 @@ services:
     image: 923839683/aws-appconfig-emulator:1.0.0
     container_name: signal-appconfig
     restart: always
-    platform: linux/amd64
     volumes:
       - ./appconfig/config.yml:/go/release/config.yml
     healthcheck:
