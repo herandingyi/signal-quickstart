@@ -175,8 +175,13 @@ fi
 
 if [ ! -f /myapp/zkparams.txt ]; then
   echo "start gen zkparams"
-  java -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar zkparams > /myapp/zkparams.txt
+  java -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar zkparams >/myapp/zkparams.txt
   echo "finish gen zkparams"
+  #替换配置文件
+  publicKey=$(grep "Public" /myapp/zkparams.txt | awk '{print $2}')
+  privateKey=$(grep "Private" /myapp/zkparams.txt | awk '{print $2}')
+  sed -i "s#^  serverPublic:.*#  serverPublic: $publicKey#" /myapp/sample.yml
+  sed -i "s#^  serverSecret:.*#  serverSecret: $privateKey#" /myapp/sample.yml
 fi
 
 #nohup 存储到 nohup-ss.out
