@@ -184,6 +184,24 @@ if [ ! -f /myapp/zkparams.txt ]; then
   sed -i "s#^  serverSecret:.*#  serverSecret: $privateKey#" /myapp/sample.yml
 fi
 
+if [ ! -f /myapp/gcp_key.txt ]; then
+  echo "start gen gcp_key"
+  cd /myapp/src/rsa || exit
+  javac Main.java && java Main >/myapp/gcp_key.txt
+  cd - || exit
+  echo "finish gen gcp_key"
+  cd /myapp/src/sedx || exit
+  javac Main.java
+  #提取私钥
+  java Main /myapp/gcp_key.txt Public:_ -----END_PUBLIC_KEY----- | tee /myapp/gcp_pri.txt
+  sed -i '/^Public:/,+2d' /myapp/gcp_pri.txt
+  java Main /myapp/sample.yml '__rsaSigningKey:_|' ____-----END_PRIVATE_KEY----- /myapp/gcp_pri.txt ____ | tee /myapp/temp.yml
+  cp /myapp/temp.yml /myapp/sample.yml
+  rm /myapp/temp.yml
+  rm /myapp/gcp_pri.txt
+  cd - || exit
+fi
+
 #nohup 存储到 nohup-ss.out
 nohup java -jar StorageService-1.94.0.jar server stg.yml >nohup-ss.out 2>&1 &
 java -server -Djava.awt.headless=true -Xmx8192m -Xss512k -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=utf-8 -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar server /myapp/sample.yml
