@@ -22,7 +22,7 @@ services:
     volumes:
       - ./dynamodb/data:/data
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000" ]
+      test: [ "CMD", "curl", "http://localhost:8000" ]
       interval: 5s
       timeout: 5s
       retries: 3
@@ -164,6 +164,7 @@ services:
   signal-server:
     image: maven:3.8.6-openjdk-18
     container_name: signal-server
+    platform: linux/amd64
     restart: "no"
     volumes:
       - ./cache/docker/maven_3.8.6-openjdk-18:/root/.m2
