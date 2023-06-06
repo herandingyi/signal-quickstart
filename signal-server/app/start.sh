@@ -63,9 +63,12 @@ public#' 's#^      Class<T> configurationClass) {#      Class<T> configurationCl
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/workers/DeleteUserCommand.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, configuration.getAppConfig().getEndpoint());#'
   # 支持本地appConfig服务
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/workers/SetUserDiscoverabilityCommand.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, configuration.getAppConfig().getEndpoint());#'
-  # 支持本地appConfig服务 使用本地dynamoDB
+
+  # 支持本地appConfig服务 使用本地dynamoDB 不使用currencyManager 不使用dataDog
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/WhisperServerService.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, config.getAppConfig().getEndpoint());\
-#' '/withRegion/,+6d' 's#AmazonDynamoDBClientBuilder.standard()#DynamoDbFromConfig.amazonDynamoDBClient(config.getDynamoDbClientConfiguration());#'
+#' '/withRegion/,+6d' 's#AmazonDynamoDBClientBuilder.standard()#DynamoDbFromConfig.amazonDynamoDBClient(config.getDynamoDbClientConfiguration());#' \
+ '/HttpClient                currencyClient/,+3d' '/environment.lifecycle().manage(currencyManager);/d' '/new PaymentsController(currencyManager, paymentsCredentialsGenerator),/d' \
+ '/final DatadogMeterRegistry datadogMeterRegistry/,+20d'
 
   # 支持s3链接本地minio
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configuration/CdnConfiguration.java 's#String region;#String region;\
@@ -222,6 +225,4 @@ if [ ! -f /myapp/unidentified_delivery_key.txt ]; then
   echo "finish modify sample's unidentified_delivery_key"
 fi
 
-#nohup 存储到 nohup-ss.out
-nohup java -jar StorageService-1.94.0.jar server stg.yml >nohup-ss.out 2>&1 &
 java -server -Djava.awt.headless=true -Xmx8192m -Xss512k -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=utf-8 -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar server /myapp/sample.yml
