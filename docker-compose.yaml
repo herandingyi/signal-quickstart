@@ -29,6 +29,42 @@ services:
     networks:
       signal_network:
         ipv4_address: 172.23.0.3
+  signal-dynamodb-starter:
+    image: amazon/aws-cli:2.2.4
+    container_name: signal-dynamodb-starter
+    restart: "no"
+    entrypoint: 'sh /myapp/start.sh'
+    volumes:
+      - ./dynamodb/aws/start.sh:/myapp/start.sh
+      - ./dynamodb/aws/config:/root/.aws
+      - ./signal-server/app:/mysignal/
+    healthcheck:
+      test: [ "CMD", "cat", "/tmp/finish" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    networks:
+      signal_network:
+        ipv4_address: 172.23.0.4
+    depends_on:
+      - signal-dynamodb
+
+  signal-dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:4.4.0
+    container_name: signal-dynamodb-admin
+    restart: always
+    ports:
+        - 8001:8001
+    environment:
+        - DYNAMO_ENDPOINT=http://172.23.0.3:8000
+        - AWS_REGION=local
+        - AWS_ACCESS_KEY_ID=accessKey
+        - AWS_SECRET_ACCESS_KEY=secretKey
+    networks:
+      signal_network:
+        ipv4_address: 172.23.0.5
+    depends_on:
+      - signal-dynamodb
 
   signal-redis-cluster1:
     image: redis:7.0.4-bullseye
@@ -177,6 +213,7 @@ services:
     depends_on:
       - signal-appconfig
       - signal-redis-cluster-starter
+      - signal-dynamodb-starter
 
 networks:
   signal_network:

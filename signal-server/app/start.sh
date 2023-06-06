@@ -67,8 +67,8 @@ public#' 's#^      Class<T> configurationClass) {#      Class<T> configurationCl
   # 支持本地appConfig服务 使用本地dynamoDB 不使用currencyManager 不使用dataDog
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/WhisperServerService.java 's#DynamicConfiguration.class);#DynamicConfiguration.class, config.getAppConfig().getEndpoint());\
 #' '/withRegion/,+6d' 's#AmazonDynamoDBClientBuilder.standard()#DynamoDbFromConfig.amazonDynamoDBClient(config.getDynamoDbClientConfiguration());#' \
- '/HttpClient                currencyClient/,+3d' '/environment.lifecycle().manage(currencyManager);/d' '/new PaymentsController(currencyManager, paymentsCredentialsGenerator),/d' \
- '/final DatadogMeterRegistry datadogMeterRegistry/,+20d'
+    '/HttpClient                currencyClient/,+3d' '/environment.lifecycle().manage(currencyManager);/d' '/new PaymentsController(currencyManager, paymentsCredentialsGenerator),/d' \
+    '/final DatadogMeterRegistry datadogMeterRegistry/,+20d'
 
   # 支持s3链接本地minio
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/configuration/CdnConfiguration.java 's#String region;#String region;\
