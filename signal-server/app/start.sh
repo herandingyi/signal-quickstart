@@ -178,10 +178,12 @@ if [ ! -f /myapp/zkparams.txt ]; then
   java -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar zkparams >/myapp/zkparams.txt
   echo "finish gen zkparams"
   #替换配置文件
+  echo "start modify sample's zkparams"
   publicKey=$(grep "Public" /myapp/zkparams.txt | awk '{print $2}')
   privateKey=$(grep "Private" /myapp/zkparams.txt | awk '{print $2}')
   sed -i "s#^  serverPublic:.*#  serverPublic: $publicKey#" /myapp/sample.yml
   sed -i "s#^  serverSecret:.*#  serverSecret: $privateKey#" /myapp/sample.yml
+  echo "finish modify sample's zkparams"
 fi
 
 if [ ! -f /myapp/gcp_key.txt ]; then
@@ -190,6 +192,7 @@ if [ ! -f /myapp/gcp_key.txt ]; then
   javac Main.java && java Main >/myapp/gcp_key.txt
   cd - || exit
   echo "finish gen gcp_key"
+  echo "start modify sample's gcp_key"
   cd /myapp/src/sedx || exit
   javac Main.java
   #提取私钥
@@ -200,6 +203,23 @@ if [ ! -f /myapp/gcp_key.txt ]; then
   rm /myapp/temp.yml
   rm /myapp/gcp_pri.txt
   cd - || exit
+  echo "finish modify sample's gcp_key"
+fi
+
+if [ ! -f /myapp/unidentified_delivery_key.txt ]; then
+  echo "start gen unidentified_delivery_key"
+  java -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar certificate -ca >/myapp/unidentified_delivery_ca.txt
+  privateKey=$(grep "Private key:" /myapp/unidentified_delivery_ca.txt | awk '{print $3}')
+  java -jar /git/src/signal-server/service/target/TextSecureServer-7.71.0-dirty.jar certificate -k "$privateKey" -i 20230606 >/myapp/unidentified_delivery_key.txt
+  echo "finish gen unidentified_delivery_key"
+  privateKey=$(grep "Private key:" /myapp/unidentified_delivery_key.txt | awk '{print $3}')
+  certificate=$(grep "Certificate:" /myapp/unidentified_delivery_key.txt | awk '{print $2}')
+
+  echo "start modify sample's unidentified_delivery_key"
+  sed -i "s#^  certificate:.*#  certificate: $certificate#" /myapp/sample.yml
+  sed -i "s#^  privateKey:.*#  privateKey: $privateKey#" /myapp/sample.yml
+  sed -i "s#^  expiresDays:.*#  expiresDays: 365#" /myapp/sample.yml
+  echo "finish modify sample's unidentified_delivery_key"
 fi
 
 #nohup 存储到 nohup-ss.out

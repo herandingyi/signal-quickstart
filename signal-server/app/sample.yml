@@ -179,9 +179,9 @@ datadog:
   environment: dev
 
 unidentifiedDelivery:
-  certificate: ABCD1234
-  privateKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789AAAAAAA
-  expiresDays: 7
+  certificate: CigIzuPSCRIhBfhEC7qO9ssVdfxHs53Jz4ie9Kn/7Y+IGRvEbUATPXhAEkCRAnRZX9I+8EoqvZ96ZtmSVoGm4tlKPPR8MWpQteqf61zoEFAc2bT0vC1DrtOn/7jvmLHu0/NlfVin+2Q/Wq+B
+  privateKey: QAiijF0W3n4BP+SUCeTgQGUf3380ESfNcV8YueLfH2k=
+  expiresDays: 365
 
 voiceVerification:
   url: https://cdn-ca.signal.org/verification/
