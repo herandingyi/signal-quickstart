@@ -86,14 +86,17 @@ public#' 's#^      Class<T> configurationClass) {#      Class<T> configurationCl
     return scheme;\
   }#'
 
-  # 请求sms验证码直接返回ok 请求人机验证直接返回ok
+  # 请求sms验证码直接返回ok 请求人机验证直接返回ok 默认验证码000000
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/controllers/AccountController.java 's#RateLimitExceededException, ImpossiblePhoneNumberException, NonNormalizedPhoneNumberException {#RateLimitExceededException, ImpossiblePhoneNumberException, NonNormalizedPhoneNumberException {\
     if (true) {\
       return Response.ok().build();\
     }#' 's#final String countryCode#if (true) {\
       return new CaptchaRequirement(false, false);\
     }\
-    final String countryCode#'
+    final String countryCode#' \
+    's#// normalization here.#// normalization here.\
+    pendingAccounts.store(number, new StoredVerificationCode("000000", System.currentTimeMillis(), "000000", null));\
+#'
 
   # storageClient不使用SSL
   recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/securestorage/SecureStorageClient.java '/withSecurityProtocol/,+1d'
@@ -162,8 +165,8 @@ public#' 's#return DynamoDbAsyncClient#    if (config.getRegion().indexOf("http"
   }\
 }#'
   # 防止报错
-  recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/NonNormalizedAccountCrawlerListener.java '/final int normalizedNumbers = metricsCluster.withCluster(connection/,+7d'\
-  's#fromUuid) {#fromUuid) {\
+  recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/NonNormalizedAccountCrawlerListener.java '/final int normalizedNumbers = metricsCluster.withCluster(connection/,+7d' \
+    's#fromUuid) {#fromUuid) {\
     final int normalizedNumbers = metricsCluster.withCluster(connection -> {\
       Object v = connection.sync().get(NORMALIZED_NUMBER_COUNT_KEY);\
       if (v == null) {\
