@@ -54,12 +54,17 @@ services:
     container_name: signal-dynamodb-admin
     restart: always
     ports:
-        - 8001:8001
+      - 8001:8001
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8001" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     environment:
-        - DYNAMO_ENDPOINT=http://172.23.0.3:8000
-        - AWS_REGION=local
-        - AWS_ACCESS_KEY_ID=accessKey
-        - AWS_SECRET_ACCESS_KEY=secretKey
+      - DYNAMO_ENDPOINT=http://172.23.0.3:8000
+      - AWS_REGION=local
+      - AWS_ACCESS_KEY_ID=accessKey
+      - AWS_SECRET_ACCESS_KEY=secretKey
     networks:
       signal_network:
         ipv4_address: 172.23.0.5
@@ -175,12 +180,12 @@ services:
     environment:
       - REDIS_CLUSTER_ANNOUNCE_IP=172.23.1.6
   signal-redis-cluster-starter:
-    image: redis:7.0.4-bullseye
+    build: ./redis/cluster/start
     container_name: signal-redis-cluster-starter
     restart: 'no'
     command: 'sh /myapp/start.sh'
     volumes:
-      - ./redis/cluster/start.sh:/myapp/start.sh
+      - ./redis/cluster/start/start.sh:/myapp/start.sh
     healthcheck:
       test: [ "CMD", "cat", "/tmp/finish" ]
       interval: 5s
