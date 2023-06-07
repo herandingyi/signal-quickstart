@@ -161,6 +161,31 @@ public#' 's#return DynamoDbAsyncClient#    if (config.getRegion().indexOf("http"
     return dynamoDBClientBuilder.build();\
   }\
 }#'
+  # 防止报错
+  recoverAndFix ./service/src/main/java/org/whispersystems/textsecuregcm/storage/NonNormalizedAccountCrawlerListener.java '/final int normalizedNumbers = metricsCluster.withCluster(connection/,+7d'\
+  's#fromUuid) {#fromUuid) {\
+    final int normalizedNumbers = metricsCluster.withCluster(connection -> {\
+      Object v = connection.sync().get(NORMALIZED_NUMBER_COUNT_KEY);\
+      if (v == null) {\
+        return 0;\
+      }\
+      return Integer.parseInt(Optional.of(v.toString()).orElse("0"));\
+    });\
+    final int nonNormalizedNumbers = metricsCluster.withCluster(connection -> {\
+      Object v = connection.sync().get(NON_NORMALIZED_NUMBER_COUNT_KEY);\
+      if (v == null) {\
+        return 0;\
+      }\
+      return Integer.parseInt(Optional.of(v.toString()).orElse("0"));\
+    });\
+    final int conflictingNumbers = metricsCluster.withCluster(connection -> {\
+      Object v = connection.sync().get(CONFLICTING_NUMBER_COUNT_KEY);\
+      if (v == null) {\
+        return 0;\
+      }\
+      return Integer.parseInt(Optional.of(v.toString()).orElse("0"));\
+    });\
+  #'
   echo "finish fix local signal"
 }
 
